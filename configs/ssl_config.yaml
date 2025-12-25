@@ -1,0 +1,29 @@
+ssl:
+  enabled: true
+  protocol: TLSv1.2
+  min_tls_version: TLSv1.2
+  max_tls_version: TLSv1.3
+  
+  cert_path: /etc/ssl/certs/server.crt
+  key_path: /etc/ssl/private/server.key
+  ca_path: /etc/ssl/certs/ca.crt
+  
+  cipher_suites:
+    - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  
+  certificate_validation: true
+  client_auth_required: false
+  
+  hsts:
+    enabled: true
+    max_age: 31536000
+    include_subdomains: true
+    preload: true
+  
+  session_config:
+    timeout: 3600
+    cache_size: 100000
+    resumption_enabled: true
