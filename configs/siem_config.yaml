@@ -1,0 +1,120 @@
+# SIEM Configuration for Workspace Security Suite
+# This configuration file sets up integration with common SIEM platforms
+
+siem:
+  enabled: true
+  platform: "splunk"  # splunk, elastic, graylog, azure_sentinel
+  environment: "production"
+
+connection:
+  # Splunk Configuration
+  splunk:
+    host: "splunk.example.com"
+    port: 8088
+    token: "${SPLUNK_HEC_TOKEN}"
+    verify_ssl: true
+    timeout: 30
+
+  # Elasticsearch Configuration
+  elasticsearch:
+    hosts:
+      - "elasticsearch.example.com:9200"
+    username: "siem_user"
+    password: "${ELASTICSEARCH_PASSWORD}"
+    index_prefix: "workspace-security"
+    use_ssl: true
+    verify_ssl: true
+
+  # Azure Sentinel Configuration
+  azure_sentinel:
+    workspace_id: "${WORKSPACE_ID}"
+    shared_key: "${SHARED_KEY}"
+    log_type: "WorkspaceSecurityEvents"
+    azure_cloud: "public"  # public, government, china
+
+event_mapping:
+  # Google Workspace events to SIEM event types
+  user_login:
+    severity: "low"
+    event_type: "Authentication"
+    source: "Google Workspace"
+  
+  security_alert:
+    severity: "high"
+    event_type: "Security Alert"
+    source: "Workspace Security Suite"
+  
+  policy_violation:
+    severity: "medium"
+    event_type: "Policy Violation"
+    source: "Workspace Security Suite"
+  
+  data_export:
+    severity: "medium"
+    event_type: "Data Access"
+    source: "Google Workspace"
+
+fields:
+  # Custom fields to include in SIEM events
+  include:
+    - organization_id
+    - user_id
+    - email
+    - ip_address
+    - user_agent
+    - timestamp
+    - event_type
+    - severity
+    - resource_id
+    - action_performed
+  
+  exclude:
+    - internal_id
+    - debug_info
+
+filtering:
+  # Filter which events to send to SIEM
+  min_severity: "low"  # low, medium, high, critical
+  
+  included_event_types:
+    - security_alert
+    - policy_violation
+    - user_login
+    - data_export
+  
+  excluded_patterns:
+    - "internal_audit.*"
+    - "system_maintenance.*"
+
+batch_settings:
+  enabled: true
+  max_batch_size: 100
+  flush_interval_seconds: 30
+  max_retries: 3
+  retry_delay_seconds: 5
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "json"  # json, text
+  output_file: "/var/log/workspace-siem.log"
+  max_file_size_mb: 100
+  backup_count: 5
+
+metrics:
+  enabled: true
+  collection_interval_seconds: 60
+  metrics_to_track:
+    - events_sent
+    - events_failed
+    - api_calls
+    - response_times
+
+alerts:
+  # SIEM platform-specific alerts
+  splunk:
+    search_name: "Workspace Security Violations"
+    cron_schedule: "*/5 * * * *"
+  
+  elasticsearch:
+    rule_name: "Workspace Security Events"
+    interval_minutes: 5
