@@ -1,0 +1,43 @@
+security:
+  headers:
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-XSS-Protection: '1; mode=block'
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    Content-Security-Policy: "default-src 'self'"
+
+  cors:
+    allowed_origins:
+      - 'https://localhost:3000'
+      - 'https://localhost:8000'
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed_headers:
+      - Content-Type
+      - Authorization
+    expose_headers:
+      - X-Total-Count
+      - X-Page-Number
+    max_age: 3600
+
+  authentication:
+    jwt_secret: '${JWT_SECRET}'
+    jwt_algorithm: 'HS256'
+    token_expiry: 3600
+    refresh_token_expiry: 604800
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_size: 20
+
+  password_policy:
+    min_length: 12
+    require_uppercase: true
+    require_lowercase: true
+    require_digits: true
+    require_special: true
+    expiry_days: 90
