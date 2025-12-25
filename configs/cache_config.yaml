@@ -1,0 +1,34 @@
+cache:
+  backends:
+    memory:
+      enabled: true
+      max_size: 1000
+      ttl: 1800
+    redis:
+      enabled: true
+      max_size: 1000000
+      ttl: 3600
+  
+  strategies:
+    lru: true
+    lfu: false
+    fifo: false
+  
+  compression:
+    enabled: true
+    threshold: 1024
+    algorithm: gzip
+  
+  serialization:
+    format: json
+    pickle_protocol: 4
+  
+  invalidation:
+    ttl_based: true
+    event_based: true
+    manual_enabled: true
+  
+  statistics:
+    track_hits: true
+    track_misses: true
+    report_interval: 300
