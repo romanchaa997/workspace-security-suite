@@ -1,0 +1,48 @@
+# Backup Schedule Configuration
+# Automated backup and disaster recovery schedules
+
+backup:
+  schedules:
+    - name: daily_incremental
+      type: incremental
+      frequency: daily
+      time: "02:00"
+      retention_days: 7
+    - name: weekly_full
+      type: full
+      frequency: weekly
+      day: sunday
+      time: "03:00"
+      retention_days: 30
+    - name: monthly_archive
+      type: full
+      frequency: monthly
+      day: 1
+      time: "04:00"
+      retention_days: 365
+
+  targets:
+    - name: google_drive
+      enabled: true
+      path: drive://backup-vault
+      compression: gzip
+      encryption: true
+    - name: cloud_storage
+      enabled: true
+      bucket: workspace-backups
+      region: us-central1
+    - name: local_nas
+      enabled: false
+      path: nas://backup-server
+
+  notifications:
+    email:
+      enabled: true
+      recipients:
+        - ops@example.com
+      on_success: false
+      on_failure: true
+    slack:
+      enabled: true
+      webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+      notify_level: warnings_and_errors
