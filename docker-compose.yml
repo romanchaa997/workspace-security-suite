@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  workspace-security-suite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workspace-security-suite
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./configs:/app/configs
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    networks:
+      - workspace-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: workspace-db
+    environment:
+      POSTGRES_DB: workspace
+      POSTGRES_USER: workspace
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - workspace-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  workspace-net:
+    driver: bridge
