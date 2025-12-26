@@ -1,0 +1,99 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-security-api
+  namespace: workspace-security
+  labels:
+    app: workspace-security-api
+    version: v1
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: workspace-security-api
+  sessionAffinity: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-security-postgres
+  namespace: workspace-security
+  labels:
+    app: postgres
+    version: v1
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgresql
+  selector:
+    app: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-security-redis
+  namespace: workspace-security
+  labels:
+    app: redis
+    version: v1
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    app: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-security-elasticsearch
+  namespace: workspace-security
+  labels:
+    app: elasticsearch
+    version: v1
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9200
+      targetPort: 9200
+      protocol: TCP
+      name: elasticsearch
+    - port: 9300
+      targetPort: 9300
+      protocol: TCP
+      name: cluster
+  selector:
+    app: elasticsearch
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-security-api-lb
+  namespace: workspace-security
+  labels:
+    app: workspace-security-api
+    version: v1
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: workspace-security-api
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
