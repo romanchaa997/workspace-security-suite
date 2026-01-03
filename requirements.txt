@@ -18,7 +18,7 @@ splunk-sdk==1.7.4
 
 # Utilities
 python-dotenv==1.0.0
-requests==2.31.0
+requests==2.32.4
 pyyaml==6.0.1
 pydantic==2.5.0
 click==8.1.7
