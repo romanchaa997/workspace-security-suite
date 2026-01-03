@@ -1,0 +1,30 @@
+# Code Owners for Workspace Security Suite
+# Comprehensive workspace security and monitoring tools
+
+* @romanchaa997
+
+# Security modules
+/security/ @romanchaa997
+/auth/ @romanchaa997
+/encryption/ @romanchaa997
+/access-control/ @romanchaa997
+
+# Monitoring and logging
+/monitoring/ @romanchaa997
+/logs/ @romanchaa997
+/alerts/ @romanchaa997
+/dashboard/ @romanchaa997
+
+# Threat detection
+/threat-detection/ @romanchaa997
+/anomaly/ @romanchaa997
+/intrusion-detection/ @romanchaa997
+
+# Configuration and infrastructure
+/.github/ @romanchaa997
+kubernetes/ @romanchaa997
+helm/ @romanchaa997
+
+# Documentation
+/*.md @romanchaa997
+/docs/ @romanchaa997
