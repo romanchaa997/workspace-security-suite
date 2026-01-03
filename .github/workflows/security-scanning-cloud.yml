@@ -1,0 +1,80 @@
+name: Security Scanning with Cloud Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 0'
+
+env:
+  AWS_REGION: eu-central-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Run Trivy security scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+    
+    - name: Push scan results to CloudWatch
+      run: |
+        aws logs put-log-events \
+          --log-group-name /github/security-scans \
+          --log-stream-name workspace-security-suite \
+          --log-events timestamp=$(date +%s000),message="Security scan completed successfully"
+    
+    - name: SonarQube scan
+      uses: SonarSource/sonarqube-scan-action@master
+      env:
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    
+    - name: ECR login and push results
+      run: |
+        aws ecr get-login-password --region ${{ env.AWS_REGION }} | \
+        docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+        echo "Security scan results available for container scanning"
+  
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run dependency check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'workspace-security-suite'
+        path: '.'
+        format: 'JSON'
+    
+    - name: Upload dependency check report
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-check-report
+        path: reports/
